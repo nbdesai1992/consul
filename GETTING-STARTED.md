@@ -10,7 +10,7 @@ You do not need to know how to code. You do need a Mac, [Claude Code](https://cl
 
 ---
 
-## Step 1: Get Consul onto your Mac
+## Step 1 · Get Consul onto your Mac
 
 Open **Terminal** (press ⌘-Space, type `Terminal`, press Enter). Paste this line and press Enter:
 
@@ -20,7 +20,7 @@ git clone https://github.com/nbdesai1992/consul.git ~/consul
 
 If a window pops up offering to install "command line developer tools", click **Install**, wait for it to finish, then paste the line again. That is Apple's free toolkit; you only do this once.
 
-## Step 2: Open Claude Code there and type /start
+## Step 2 · Open Claude Code there and type /start
 
 Paste this line and press Enter:
 
@@ -34,18 +34,18 @@ Claude Code opens. Type:
 /start
 ```
 
-## Step 3: Follow along
+## Step 3 · Follow along
 
-Claude takes it from here, one step at a time. It will:
+Claude takes it from here, one step at a time, and each message says which step you're on (Step 2 of 6, and so on). It will:
 
-1. **Check your Mac** and install two small helper tools if they're missing. It may ask you to paste a line beginning with `!` — that runs a command for you and sometimes asks for your Mac password.
+1. **Check your Mac** and install two small helper tools if they're missing. It may ask you to paste a line beginning with `!`. That runs a command for you and sometimes asks for your Mac password.
 2. **Log you in to GitHub.** GitHub is where the code lives. If you don't have an account, create one at [github.com](https://github.com) (free) when Claude asks.
 3. **Set up Render.** Render is where the app runs. Claude gives you the exact clicks, one at a time: create an account, add a card, allow Render to read your GitHub, create an "API key" and hand it to Claude. See the appendix below if you want to read ahead.
 4. **Ask four questions:** what the project is called, what it does in one sentence, who it's for, and whether people will sign in.
 5. **Ask before spending money**, then create everything. About five minutes. At the end it shows you two web addresses. That's your app, with a placeholder page.
 6. **Tell you how to start building**, which is the next section.
 
-## Then: build your app
+## Then build your app
 
 Claude's last message tells you to open a **new** Terminal window and paste a line like:
 
@@ -53,7 +53,9 @@ Claude's last message tells you to open a **new** Terminal window and paste a li
 cd ~/code/my-app && claude
 ```
 
-That opens Claude Code inside your new project. Type `/spec create "` and describe what you want the app to do, then close the quote. Claude interviews you about it, writes a plan, and gives you a line beginning with `/goal`. Paste that line. Consul builds, tests, designs, and publishes on its own. Whenever it needs a decision from you, it asks a short question with options; answer in the chat. When it finishes, it gives you the live address.
+Claude Code first asks whether you trust this folder. Choose **Yes**. That is what lets the project's guardrails run.
+
+That opens Claude Code inside your new project. Type `/spec create "` and describe what you want the app to do, then close the quote. Claude interviews you about it, writes a plan, and gives you a line beginning with `/goal`, on its own. Copy it, paste it, and press Enter. Consul builds, tests, designs, and publishes on its own. Whenever it needs a decision from you, it asks a short question with options; answer in the chat. When it finishes, it gives you the live address.
 
 Useful while it runs:
 
@@ -75,7 +77,7 @@ All of these are private to your Mac and your project. None of them are ever put
 
 If you ever need to replace the Render key: in the Consul folder, paste `! python3 onboard.py --set-render-key` and enter the new one.
 
-## Appendix: Render account setup, click by click
+## Appendix · Render account setup, click by click
 
 Claude walks you through this during `/start`; this is the same thing written down.
 
@@ -90,17 +92,19 @@ That is everything Render ever needs from you. You never create servers in the D
 
 - During `/start`: Claude explains the error and how to fix it, then repeats the step. It is always safe to type `/start` again.
 - Inside a project: type `/preflight`. Every line says PASS, WARN, or FAIL, and each FAIL comes with its fix.
-- The three most common causes are: no card on Render, Render not allowed to read your GitHub, or a Render key that was deleted. Each takes a minute to fix in the Render Dashboard.
+- The three most common causes are no card on Render, Render not allowed to read your GitHub, or a Render key that was deleted. Each takes a minute to fix in the Render Dashboard.
 
 ## Deleting a project
 
 In the project folder, in Terminal:
 
 ```bash
-python3 .claude/scripts/provision.py --destroy
+python3 .claude/scripts/provision.py --destroy --delete-repo
 ```
 
-It lists what will be deleted, asks you to type the project's name to confirm, and removes the servers and database. Render stops billing. Then delete the repository on GitHub: open it at github.com → **Settings** → scroll to the bottom → **Delete this repository**.
+It lists what will be deleted, asks you to type the project's name to confirm, then removes the servers, the database, and the repository on GitHub. Render stops billing. To keep the code, leave off `--delete-repo`.
+
+If it says GitHub needs the `delete_repo` permission, paste `! gh auth refresh -h github.com -s delete_repo` in Claude Code once, approve in the browser, and run the command again.
 
 ## Starting another project
 
