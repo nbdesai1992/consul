@@ -64,7 +64,21 @@ Your plan is a card on a board in `briefs/`, and its folder is its status.
 
 > **Done means checked.** A brief reaches `4-done/` only when every requirement has evidence behind it, and a brief that needs you is never reported as finished. Hooks enforce this, so it holds even when a model forgets.
 
-<!-- REAL-RUN -->
+## A real run
+
+One sentence and four interview answers in, on 2026-09-26: *"Quill Invoices: freelancers create invoices, mark them sent or paid, and see who owes them money."*
+
+- **The brief.** Seven requirements: four features, backend tests, "works on the live site against the real database", and "looks like a tool a designer would enjoy using".
+- **The run.** One `/goal` session, about 70 minutes, 11 specialist subtasks, 0 blockers. Consul pushed and verified each deploy, drove the live site end to end with screenshots, and deleted its own test invoices before calling it done.
+- **The result.** A ledger-styled app on Render. The screens below are the live app, with a few sample invoices added for the picture.
+
+<p align="center">
+  <img src="docs/demo/quill-ledger.jpg" alt="Quill Invoices, built by Consul: a ledger-style invoices screen with outstanding, overdue, and paid-this-month figures, status tabs, and five invoices, one flagged overdue by 8 days." width="49%">
+  <img src="docs/demo/quill-new-invoice.jpg" alt="Quill Invoices new-invoice form: billed to, issued and due dates, line items with quantity times rate, and a live total." width="49%">
+</p>
+
+The project was deleted afterwards with `provision.py --destroy`.
+
 
 ## Set up once (about 20 minutes)
 

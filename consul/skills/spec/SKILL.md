@@ -240,6 +240,7 @@ If a brief ID is given in `$ARGUMENTS`, also show that brief's requirements with
 
 ## Rules
 
+- Test requirements never exclude the project's database. The backend-test skill runs tests against the Render database in `backend/.env`, so write acceptance like "`pytest` passes against the project database", never "without the production database" or "on SQLite". A separate test database is a Technical Constraint the human asks for, not a default.
 - Requirement IDs are PERMANENT. Never reuse, never renumber.
 - The spec skill writes briefs ONLY to `1-backlog/` (create) or edits them in place (update). It NEVER moves briefs between folders — that is the runner's job.
 - The spec skill NEVER fills the Task Breakdown or checks requirement checkboxes.
