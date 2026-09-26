@@ -46,9 +46,12 @@ consul/
 │           ├── verify-ui/  # Screenshot verification (needs server config)
 │           ├── preflight/  # /preflight — wraps scripts/preflight.py
 │           └── deploy/     # Platform adapters (render, etc.)
+├── tests/                  # Offline wizard tests (python3 -m unittest discover -s tests)
 └── docs/
+    ├── index.html          # Landing page (GitHub Pages)
     ├── HUMAN-INTERVENTION-GUIDE.md
-    └── decisions.md        # Consul-level decision log
+    ├── decisions.md        # Consul-level decision log
+    └── archive/            # Earlier design docs, kept for history
 ```
 
 ## How to Use
