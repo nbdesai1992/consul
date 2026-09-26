@@ -90,6 +90,7 @@ STATUS: completed
 SUMMARY: {what you built; requirements advanced: FR-X, FR-Y}
 FILES MODIFIED: {path — what changed}
 TEST/VERIFICATION RESULTS: {test name: PASS/FAIL — real output, X/Y passing}
+LIVE TEST DATA: {records created on the deployed app or shared DB, and confirmation each was removed — or "none"}
 INTERFACE CONTRACTS: {exact shapes, or "none"}
 DECISIONS: {what + why, or "none"}
 ```

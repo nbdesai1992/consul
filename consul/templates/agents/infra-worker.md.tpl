@@ -79,6 +79,7 @@ STATUS: completed
 SUMMARY: {what you provisioned/deployed/configured; service statuses; requirements advanced}
 FILES MODIFIED: {path — what changed}
 TEST/VERIFICATION RESULTS: {service status, deploy status, health checks, log checks}
+LIVE TEST DATA: {records created on the deployed app or shared DB, and confirmation each was removed — or "none"}
 INFRASTRUCTURE CREATED: {Service: name | ID | type; Database: name | connection — or "none"}
 INTERFACE CONTRACTS: {actual service URLs discovered, or "none"}
 DECISIONS: {what + why, or "none"}

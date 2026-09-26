@@ -93,6 +93,7 @@ STATUS: completed
 SUMMARY: {what you built; key design choices; requirements advanced: FR-X, FR-Y}
 FILES MODIFIED: {path — what changed}
 TEST/VERIFICATION RESULTS: {screenshot verdicts per quality gate, pages verified}
+LIVE TEST DATA: {records created on the deployed app or shared DB, and confirmation each was removed — or "none"}
 INTERFACE CONTRACTS: {component interfaces defined, or "none"}
 DECISIONS: {what + why, or "none"}
 ```

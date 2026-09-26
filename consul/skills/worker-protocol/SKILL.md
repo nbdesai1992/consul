@@ -60,6 +60,10 @@ API: POST /api/users
 
 If your subtask CONSUMES an interface, the contract is in your spawn prompt. If it doesn't match what you need, report STATUS: blocked — do not improvise around it.
 
+## Leave the Live App Clean
+
+Records you create on the deployed app or the shared Render database to prove something works (test users, sample notes, fake invoices) are yours to remove before you report. The person's app should look untouched by testing. Keep data only when a requirement asks for seed or demo content, and say so. Tests that create rows through the test suite clean up after themselves the same way.
+
 ## When Stuck
 
 If you hit something you cannot resolve — unclear requirement, missing dependency, needs a human decision, external action required:
@@ -75,6 +79,7 @@ STATUS: completed | blocked | failed
 SUMMARY: {what you built/changed — 2-3 sentences; requirements advanced: FR-X, FR-Y}
 FILES MODIFIED: {path — what changed, one per line; include integration touchpoints}
 TEST/VERIFICATION RESULTS: {test names + PASS/FAIL, screenshot verdicts, health checks}
+LIVE TEST DATA: {records created on the deployed app or shared DB, and confirmation each was removed — or "none"}
 INTERFACE CONTRACTS: {contracts created, exact shapes — or "none"}
 DECISIONS: {what was chosen + why, for each significant technical choice — or "none"}
 {if blocked → TYPE / DESCRIPTION / CONTEXT / OPTIONS as above}

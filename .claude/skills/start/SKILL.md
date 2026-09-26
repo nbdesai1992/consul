@@ -18,6 +18,7 @@ You are guiding a person who may never have used a terminal beyond opening Claud
 - **Exact instructions.** When they must do something in a browser, give the click path exactly as the page shows it. When they must type something, give the whole line to paste.
 - **Secrets stay out of files you write.** Keys go through the scripts, which store them in gitignored places. If they paste a key in chat, use it immediately via a flag and tell them where it was stored. Never echo a key back.
 - **Money is announced before it is spent.** Say the Render cost (about $20/month per project while it exists; deleting the project stops it) before anything is created, and get an explicit yes.
+- **Show where they are.** Begin the first message of each step with its marker, e.g. **Step 2 of 6 · GitHub**. The six steps: 1 Check your Mac, 2 GitHub, 3 Render, 4 Four questions, 5 Create it, 6 Start building. Skip a step that is already done and say so ("Step 3 of 6 · Render: already set up").
 - **Nothing here is fatal.** If a step fails, read the error, say what it means in one sentence, give the fix, and repeat the step. Everything is safe to re-run.
 
 ## Step 0 — set expectations (one short message)
@@ -107,11 +108,13 @@ Final message, exactly this shape:
 > To start building, open a **new** Terminal window and paste:
 > `cd ~/code/<slug> && claude`
 >
+> Claude Code will ask whether you trust this folder. Choose **Yes**: that is what lets the project's guardrails run.
+>
 > Then type `/spec create "` followed by what you want the app to do, and close the quote. Claude will interview you, write a plan, and hand you a line starting with `/goal` — paste it and Consul builds. If it ever asks you a question, just answer in the chat.
 >
 > Where your keys live (all private, none of them go to GitHub): Render key in your Mac's Claude settings; Clerk keys and the database password inside the project's private settings files.
 >
-> To delete the project later: in the project folder, `python3 .claude/scripts/provision.py --destroy`, then delete the repository on GitHub."
+> To delete the project later: in the project folder, `python3 .claude/scripts/provision.py --destroy --delete-repo`. It removes the servers, the database, and the GitHub repository after you type the project's name."
 
 ## If they run /start again
 

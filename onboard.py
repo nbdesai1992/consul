@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 Consul — Project Onboarding
 
 Sets up the Claude Code orchestration system for a target project.
@@ -14,9 +14,24 @@ Usage:
     python onboard.py --set-render-key      # Store a Render API key machine-wide (~/.claude/settings.json)
     python onboard.py --check               # Machine check only (tools, credential)
 
+    python onboard.py --help                # This text
+
+Modes:
+    --quick                 Quick Start: four plain questions, every technical default
+    --custom                Custom: choose stack, auth, env group, and who pushes
+
 Non-interactive (how the /start skill drives it):
     python onboard.py ~/code/my-app --quick --yes --name "My App" \
         --description "..." --domain "..." --login no [--clerk-publishable-key pk_... --clerk-secret-key sk_...]
+    --yes                   Accept every default and every y/n confirmation
+    --no-github             Skip creating the GitHub repo (and so provisioning)
+    --no-provision          Skip creating the Render services
+
+Updating a project to a newer Consul: pull this repo, then run
+    python onboard.py /path/to/project --reconfigure
+It re-renders skills, agents, hooks, scripts, settings, and CLAUDE.md from the
+saved config (the previous CLAUDE.md is kept in session/). Your code,
+render.yaml, briefs/, and secrets are left alone.
 """
 
 import getpass
@@ -187,6 +202,7 @@ AUTO_YES = False
 CONFIG_FILE = "consul.json"
 LEGACY_CONFIG_FILES = ("shipwright.json", "factory-config.json")
 RUNNER_PUSH_POLICIES = ("consul", "shipwright", "factory")
+DEFAULT_PROJECT_NAME = ""      # Custom mode's default name: the target folder's name (set in main)
 
 
 def parse_flags(argv: list) -> list:
@@ -221,7 +237,7 @@ def has_flag(name: str) -> bool:
 def ask(prompt: str, default: str = "", key: str = "") -> str:
     if key and key in ANSWERS:
         return ANSWERS[key]
-    if AUTO_YES and default:
+    if AUTO_YES:                    # --yes: take the default, even a blank one
         return default
     suffix = f" [{default}]" if default else ""
     result = input(f"  {prompt}{suffix}: ").strip()
@@ -370,12 +386,13 @@ def machine_preflight():
 
     line(shutil.which("dev-browser") is not None, "dev-browser (frontend screenshots)",
          "npm install -g dev-browser")
-    node_ok = shutil.which("node") is not None
-    if node_ok:
+    if shutil.which("node"):
         _, ver = run_cmd(["node", "--version"], Path.cwd())
-        line(True, f"node {ver}")
+        m = re.match(r"v?(\d+)", ver or "")
+        line(bool(m) and int(m.group(1)) >= 18, f"node {ver}" + ("" if m and int(m.group(1)) >= 18 else " (needs 18+)"),
+             "install Node 18+ (/start installs it for you)")
     else:
-        line(False, "node (local frontend dev server)", "install Node 18+")
+        line(False, "node (local frontend dev server)", "install Node 18+ (/start installs it for you)")
     print()
 
 
@@ -510,7 +527,7 @@ def interview_quick() -> ProjectConfig:
     print("  hosted on Render, in one GitHub repository. Press Enter to accept [defaults].")
     print()
 
-    config.project_name = ask("What is the project called?", key="name")
+    config.project_name = ask("What is the project called?", DEFAULT_PROJECT_NAME, key="name")
     config.project_slug = re.sub(r"-+", "-", re.sub(r"[^a-z0-9-]", "-", config.project_name.lower())).strip("-")
     config.project_description = ask("In one sentence, what does it do?", key="description")
     config.domain = ask("Who is it for, or what world does it live in? (e.g. 'freelancers sending invoices')", key="domain")
@@ -552,12 +569,12 @@ def interview() -> ProjectConfig:
 
     # ── Identity ──
     print("  --- Project Identity ---")
-    config.project_name = ask("Project name")
+    config.project_name = ask("Project name", DEFAULT_PROJECT_NAME, key="name")
     config.project_slug = re.sub(r"[^a-z0-9-]", "-", config.project_name.lower())
     config.project_slug = re.sub(r"-+", "-", config.project_slug).strip("-")
     config.project_slug = ask("Project slug (for URLs)", config.project_slug)
-    config.project_description = ask("Describe your project in 1-2 sentences")
-    config.domain = ask("Domain/industry (e.g., 'finance', 'healthcare', 'e-commerce')")
+    config.project_description = ask("Describe your project in 1-2 sentences", key="description")
+    config.domain = ask("Domain/industry (e.g., 'finance', 'healthcare', 'e-commerce')", key="domain")
 
     # ── Design Direction ──
     print("\n  --- Design Direction ---")
@@ -1318,7 +1335,13 @@ def setup_project(config: ProjectConfig, target: Path, source: Path):
     # ── 5. CLAUDE.md ──
     claude_tpl = templates / "CLAUDE.md.tpl"
     if claude_tpl.exists():
-        render_file(claude_tpl, target / "CLAUDE.md", replacements)
+        existing_md = target / "CLAUDE.md"
+        if existing_md.exists():          # re-onboarding: keep the old one (session/ is gitignored)
+            backup = target / "session" / "CLAUDE.md.before-reconfigure"
+            backup.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(existing_md, backup)
+            print(f"    . previous CLAUDE.md saved to session/{backup.name}")
+        render_file(claude_tpl, existing_md, replacements)
 
     # ── 5b. Brief board (committed Kanban: folder = status) ──
     print("\n  Brief board:")
@@ -1433,6 +1456,10 @@ def setup_project(config: ProjectConfig, target: Path, source: Path):
 # ──────────────────────────────────────────────
 
 def main():
+    global DEFAULT_PROJECT_NAME
+    if any(a in ("--help", "-h") for a in sys.argv[1:]):
+        print(__doc__.strip())
+        sys.exit(0)
     # Determine the Consul source directory (next to this script)
     script_dir = Path(__file__).resolve().parent
     consul_dir = script_dir / "consul"
@@ -1488,6 +1515,7 @@ def main():
         sys.exit(1)
 
     print(f"\n  Target project: {target}")
+    DEFAULT_PROJECT_NAME = target.name
 
     # Check for existing config (re-onboarding)
     # consul.json, else a config written before a rename (shipwright.json, factory-config.json)

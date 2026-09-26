@@ -178,18 +178,21 @@ Iterate until the human approves.
    **Input:** {question asked or user's request}
    **Output:** {user's response or spec content}
    ```
-4. Tell the human, filling in every placeholder:
+4. Tell the human, filling in every placeholder. The `/goal` line goes alone in its own code block so it copies cleanly, and nothing after it competes for attention:
 
 ````
-Brief created: briefs/1-backlog/{brief-id}.md
+Brief created: briefs/1-backlog/{brief-id}.md ({N} requirements)
 
-To run it autonomously, paste this goal (it starts working immediately and
-keeps going until the brief reaches a terminal folder):
+Next: copy the line below, paste it here, and press Enter. Consul then works
+turn after turn until the brief is done or needs you. A small app takes
+roughly an hour. You can close the window at any point and pick up later
+with /orchestrate.
 
+```
 /goal Brief {brief-id} ("{title}") is in a terminal folder: briefs/4-done/ or briefs/3-blocked/. These are DISTINCT terminals. (A) COMPLETE — the brief is in briefs/4-done/ with every requirement checkbox checked, each verified against its acceptance criteria. (B) NEEDS HUMAN INTERVENTION — the brief is in briefs/3-blocked/, legitimate ONLY after every runnable subtask finished and every blocker is documented with options and an empty "Resolution:" line; the final turn must announce "NEEDS HUMAN INTERVENTION" with the open questions and must NOT claim success. Work the brief per its Execution Protocol section (invoke /orchestrate to start). Never weaken or remove requirements, never check a box without verified acceptance, never route to blocked while runnable work remains. Prove board state every turn by running: ls briefs/2-active/ briefs/3-blocked/ briefs/4-done/. Safety: stop after {turn_cap} turns and report remaining work.
+```
 
-Or run it manually, one turn at a time, with /orchestrate.
-Check progress anytime with /status.
+Prefer one turn at a time? Run /orchestrate instead. /status shows the board.
 ````
 
 ---

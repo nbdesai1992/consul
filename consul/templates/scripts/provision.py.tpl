@@ -13,6 +13,7 @@ needs no Dashboard visit beyond account setup.
     python3 .claude/scripts/provision.py --yes      # apply without confirming
     python3 .claude/scripts/provision.py --set CLERK_SECRET_KEY=sk_...   # supply a secret
     python3 .claude/scripts/provision.py --destroy  # delete this project's services + databases (asks you to type the slug)
+    python3 .claude/scripts/provision.py --destroy --delete-repo   # ...and its GitHub repository too
 
 Idempotent: every resource is looked up by name in the pinned workspace and
 created only if missing. It never deletes anything and never overwrites an
@@ -496,6 +497,42 @@ def destroy(rnd, owner, spec, confirmed):
     say("\n== destroyed == (env groups untouched; backend/.env left in place — its DATABASE_URL is now dead)")
 
 
+def github_repo_slug():
+    """owner/name of the origin remote, or '' if it isn't on GitHub."""
+    code, url = run(["git", "remote", "get-url", "origin"])
+    m = re.search(r"github\.com[:/](.+?/.+?)(?:\.git)?/?$", url.strip()) if code == 0 and url else None
+    return m.group(1) if m else ""
+
+
+def delete_github_repo(requested, interactive, dry_run):
+    """Offer to delete the GitHub repo after the Render resources are gone.
+    Only with --delete-repo, or a typed yes when run interactively; --yes alone
+    never deletes code."""
+    repo = github_repo_slug()
+    if not repo:
+        return
+    if not requested:
+        if not interactive:
+            say(f"   GitHub repo {repo} kept. To delete it too: add --delete-repo")
+            return
+        answer = input(f"\n   Also delete the GitHub repository {repo}? Its code and history are deleted too. [y/N]: ")
+        if answer.strip().lower() not in ("y", "yes"):
+            say(f"   GitHub repo {repo} kept.")
+            return
+    if dry_run:
+        say(f"[plan] would delete GitHub repo {repo}")
+        return
+    code, out = run(["gh", "repo", "delete", repo, "--yes"])
+    if code == 0:
+        say(f"[gone] GitHub repo {repo}")
+    elif "delete_repo" in (out or ""):
+        say(f"[FAIL] GitHub repo {repo} not deleted: gh needs the delete_repo permission")
+        say("       → gh auth refresh -h github.com -s delete_repo   (once), then run this again")
+    else:
+        say(f"[FAIL] GitHub repo {repo} not deleted: {(out or '').strip().splitlines()[-1] if out else 'gh failed'}")
+        say(f"       → delete it at https://github.com/{repo}/settings (bottom of the page)")
+
+
 # ── main ─────────────────────────────────────────────────────────
 
 def main():
@@ -507,6 +544,7 @@ def main():
     ap.add_argument("--branch", default="", help="branch to deploy (default: current)")
     ap.add_argument("--allow-ip", default="all", help="database external access: all | <cidr> | none (default all)")
     ap.add_argument("--destroy", action="store_true", help="delete this project's declared services and databases")
+    ap.add_argument("--delete-repo", action="store_true", help="with --destroy: also delete the GitHub repository")
     args = ap.parse_args()
 
     say(f"== consul provision: {{PROJECT_NAME}} ==")
@@ -523,6 +561,7 @@ def main():
 
     if args.destroy:
         destroy(rnd, owner, spec, confirmed=args.yes)
+        delete_github_repo(args.delete_repo, interactive=not args.yes and sys.stdin.isatty(), dry_run=args.dry_run)
         return
 
     repo, branch, pushed = resolve_repo(args.branch)

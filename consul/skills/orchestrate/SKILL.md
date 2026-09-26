@@ -94,6 +94,7 @@ When all subtasks in the current phase are terminal (completed/blocked/cancelled
 ## Phase 4: Route the Brief (terminal states — these are DIFFERENT outcomes)
 
 **All requirement checkboxes checked** →
+0. Check every worker report's `LIVE TEST DATA` line. If anything created for testing is still on the live app, spawn one cleanup subtask first and route after it reports.
 1. Frontmatter: `outcome: completed`. Write `## Outcome`: what was built, evidence per requirement, any non-gating follow-ups.
 2. `mv briefs/2-active/{brief-id}.md briefs/4-done/`
 3. Announce: `✅ BRIEF COMPLETE: {brief-id} — {title}` with a short summary.
